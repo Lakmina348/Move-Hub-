@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player | Lakmina Cinema</title>
+    <style>
+        /* මූලික සැකසුම් */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000; color: rgb(43, 41, 187); overflow-x: hidden; }
+
+        /* Navbar */
+        .navbar {
+            padding: 15px 5%; background: rgba(0,0,0,0.9);
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; width: 100%; z-index: 1000;
+        }
+        .logo { color: #ffffff; font-size: 22px; font-weight: bold; text-decoration: none; }
+        .back-btn { color: white; text-decoration: none; background: #333; padding: 6px 15px; border-radius: 4px; font-size: 14px; }
+
+        /* Video Container */
+        .player-section {
+            padding-top: 100px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: 10px; padding-right: 10px;
+        }
+
+        /* Drive Video එක Responsive කරන ක්‍රමය */
+        .video-box {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #756c6c;
+            box-shadow: 0 0 20px rgba(255, 187, 191, 0.2);
+        }
+
+        .video-box iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        /* පින්තූරයේ ඇති Pop-out icon එක සහ අනෙකුත් බටන් බ්ලොක් කරන ලේයර් එක */
+        .ui-blocker {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20%; /* දකුණු පැත්තේ ඇති අයිකන වැසීමට */
+            height: 20%;
+            z-index: 10;
+            background: transparent; /* පාරදෘශ්‍යයි නමුත් click බ්ලොක් කරයි */
+        }
+
+        /* Movie Details */
+        .movie-details {
+            margin-top: 25px;
+            padding-bottom: 50px;
+        }
+
+        .movie-details h1 { font-size: 26px; color: #cecece; margin-bottom: 10px; }
+        .movie-details p { color: #ccc; line-height: 1.6; font-size: 15px; }
+
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 20px; border-radius: 5px; text-decoration: none; 
+            font-weight: bold; display: inline-block; transition: 0.3s;
+            cursor: pointer; border: none; font-size: 14px;
+        }
+        .btn-play { background: #686363; color: white; }
+        /* හරවන බටන් එකේ පෙනුම */
+        .btn-rotate { background: #fbc02d; color: black; }
+        
+        .btn:hover { opacity: 0.8; }
+
+        @media (min-width: 800px) {
+            .player-section { padding-top: 120px; }
+            .movie-details h1 { font-size: 35px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="වැඩි විස්තර.html" class="logo">Lakmina Cinema</a>
+        <a href="home1.html" class="back-btn">Back</a>
+    </nav>
+
+    <div class="player-section">
+        <div class="video-box" id="v-wrapper">
+            <div class="ui-blocker"></div>
+            
+            <iframe 
+                id="main-frame"
+                src="https://drive.google.com/file/d/1dhfvDZ8KD7ret0ZdzHTPhRssQFf25kyJ/preview" 
+                allow="autoplay">
+            </iframe>
+        </div>
+
+        <div class="movie-details">
+            <h1>නරඹන චිත්‍රපටය</h1>
+            <p>
+                වීඩියෝව හරවා සම්පූර්ණ තිරය පුරා (Full Screen) නැරඹීමට පහත බටන් එක භාවිතා කරන්න.
+            </p>
+
+            <div class="btn-group">
+                <button class="btn btn-rotate" onclick="playFullRotate()">Rotate & Full Screen</button>
+                <a href="#" class="btn btn-play" onclick="location.reload()">Refresh Player</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function playFullRotate() {
+            const wrapper = document.getElementById('v-wrapper');
+            const frame = document.getElementById('main-frame');
+
+            // Fullscreen කිරීම
+            if (wrapper.requestFullscreen) {
+                wrapper.requestFullscreen();
+            } else if (wrapper.webkitRequestFullscreen) {
+                wrapper.webkitRequestFullscreen();
+            } else if (wrapper.msRequestFullscreen) {
+                wrapper.msRequestFullscreen();
+            }
+
+            // Landscape එකට හරවන්න උත්සාහ කිරීම (Phone එකට)
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => {
+                    console.log("Orientation lock failed: ", err);
+                });
+            }
+        }
+
+        // Fullscreen එකෙන් අයින් වෙද්දී ආපහු හරවන්න
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
+        });
+    </script>
+
+</body>
+</html>

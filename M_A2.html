@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player | Lakmina Cinema</title>
+    <style>
+        /* මූලික සැකසුම් */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #232769; color: rgb(43, 41, 187); overflow-x: hidden; }
+
+        /* Navbar */
+        .navbar {
+            padding: 15px 5%; background: rgba(0,0,0,0.9);
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; width: 100%; z-index: 1000;
+        }
+        .logo { color: #ffffff; font-size: 22px; font-weight: bold; text-decoration: none; }
+        .back-btn { color: white; text-decoration: none; background: #333; padding: 6px 15px; border-radius: 4px; font-size: 14px; }
+
+        /* Video Container */
+        .player-section {
+            padding-top: 100px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: 10px; padding-right: 10px;
+        }
+
+        .video-box {
+            position: relative;
+            padding-bottom: 56.25%; 
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #000;
+            box-shadow: 0 0 20px rgba(255, 187, 191, 0.2);
+        }
+
+        .video-box iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* --- නවීකරණය කරන ලද ආරක්ෂිත ස්ථර (Shields) --- */
+        
+        /* 1. ඉහළ ලින්ක් බ්ලොක් කිරීම (Title, Pop-out) */
+        .shield-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20%; 
+            z-index: 10;
+            background: transparent;
+        }
+
+        /* 2. දකුණු පස ඇති Share/Links බ්ලොක් කිරීම (මැද Play එක නිදහස්ව තබමින්) */
+        .shield-right-side {
+            position: absolute;
+            top: 20%;
+            right: 0;
+            width: 25%; /* දකුණු පැත්තේ ඇති ලින්ක් වැසීමට */
+            height: 65%; 
+            z-index: 10;
+            background: transparent;
+        }
+
+        /* 3. පහළ දකුණේ ඇති Drive ලින්ක් එක බ්ලොක් කිරීම */
+        .shield-bottom-right {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            height: 15%; 
+            z-index: 10;
+            background: transparent;
+        }
+
+        /* Movie Details */
+        .movie-details {
+            margin-top: 25px;
+            padding-bottom: 50px;
+        }
+
+        .movie-details h1 { font-size: 26px; color: #cecece; margin-bottom: 10px; }
+        .movie-details p { color: #ccc; line-height: 1.6; font-size: 15px; }
+
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 20px; border-radius: 5px; text-decoration: none; 
+            font-weight: bold; display: inline-block; transition: 0.3s;
+            cursor: pointer; border: none; font-size: 14px;
+        }
+        .btn-play { background: #662207; color: white; }
+        .btn-rotate { background: #fbc02d; color: rgb(0, 0, 0); }
+        
+        .btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="වැඩි විස්තර.html" class="logo">Lakmina Cinema</a>
+        <a href="home1.html" class="back-btn">Back</a>
+    </nav>
+
+    <div class="player-section">
+        <div class="video-box" id="v-wrapper">
+            <div class="shield-top"></div>
+            <div class="shield-right-side"></div>
+            <div class="shield-bottom-right"></div>
+            
+            <iframe 
+                id="main-frame"
+                src="https://drive.google.com/file/d/14ijL5aqi-m9fBxTkbtFNu8jLqaiiLprg/preview" 
+                allow="autoplay">
+            </iframe>
+        </div>
+
+        <div class="movie-details">
+            <h1>නරඹන චිත්‍රපටය</h1>
+            <p>වීඩියෝව හරවා සම්පූර්ණ තිරය පුරා (Full Screen) නැරඹීමට පහත බටන් එක භාවිතා කරන්න.</p>
+
+            <div class="btn-group">
+                <button class="btn btn-rotate" onclick="playFullRotate()">Rotate & Full Screen</button>
+                <a href="#" class="btn btn-play" onclick="location.reload()">Refresh Player</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function playFullRotate() {
+            const wrapper = document.getElementById('v-wrapper');
+            if (wrapper.requestFullscreen) {
+                wrapper.requestFullscreen();
+            } else if (wrapper.webkitRequestFullscreen) {
+                wrapper.webkitRequestFullscreen();
+            } else if (wrapper.msRequestFullscreen) {
+                wrapper.msRequestFullscreen();
+            }
+
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => {
+                    console.log("Orientation lock failed: ", err);
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>
