@@ -6,377 +6,143 @@
     <title>Video Player | Lakmina Cinema</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background: #0a0a0f;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+        body { background: #0a0a0f; color: #fff; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; min-height: 100vh; }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            padding: 14px 5%;
-            background: rgba(10,10,15,0.95);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #1e1e2e;
-        }
+        .navbar { padding: 14px 5%; background: rgba(10,10,15,0.97); display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid #1e1e2e; }
         .logo { color: #e8b4b8; font-size: 20px; font-weight: 700; text-decoration: none; letter-spacing: 1px; }
-        .back-btn {
-            color: #aaa;
-            text-decoration: none;
-            background: #1e1e2e;
-            padding: 6px 16px;
-            border-radius: 4px;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-        .back-btn:hover { background: #2e2e4e; color: #fff; }
+        .back-btn { color: #aaa; text-decoration: none; background: #1e1e2e; padding: 6px 16px; border-radius: 4px; font-size: 13px; }
 
-        /* ── MAIN LAYOUT ── */
-        .player-section {
-            padding-top: 70px;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding-left: 12px;
-            padding-right: 12px;
-        }
+        .player-section { padding-top: 68px; max-width: 1000px; margin: 0 auto; padding-left: 10px; padding-right: 10px; }
 
         /* ── VIDEO WRAPPER ── */
         .video-wrapper {
             position: relative;
             background: #000;
-            border-radius: 10px;
+            border-radius: 10px 10px 0 0;
             overflow: hidden;
             aspect-ratio: 16/9;
-            box-shadow: 0 0 40px rgba(232,180,184,0.15);
+            box-shadow: 0 0 40px rgba(232,180,184,0.12);
         }
 
-        .video-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        video {
+            width: 100%; height: 100%;
             display: block;
+            background: #000;
         }
 
-        /* Drive UI blocker - top right corner */
-        .ui-blocker {
-            position: absolute;
-            top: 0; right: 0;
-            width: 160px; height: 60px;
-            z-index: 5;
-            background: transparent;
-            pointer-events: all;
-        }
-        /* Drive bottom bar blocker */
-        .ui-blocker-bottom {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 55px;
-            z-index: 5;
-            background: transparent;
-            pointer-events: all;
-        }
-
-        /* ── CUSTOM CONTROLS ── */
+        /* ── CONTROLS BAR ── */
         .controls-bar {
-            background: linear-gradient(to top, #0a0a0f, #111122);
-            padding: 10px 14px 8px;
-            border-radius: 0 0 10px 10px;
+            background: #0d0d1a;
             border: 1px solid #1e1e2e;
             border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 10px 12px 10px;
+            user-select: none;
         }
 
         /* Timeline */
-        .timeline-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .time-label {
-            color: #aaa;
-            font-size: 12px;
-            white-space: nowrap;
-            min-width: 80px;
-            text-align: center;
-        }
+        .timeline-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+        .time-label { color: #888; font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
         .timeline-slider {
-            flex: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 5px;
-            background: #2e2e4e;
-            border-radius: 5px;
-            outline: none;
-            cursor: pointer;
-            position: relative;
+            flex: 1; -webkit-appearance: none; appearance: none;
+            height: 5px; background: #2a2a40; border-radius: 5px; outline: none; cursor: pointer;
         }
-        .timeline-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px; height: 16px;
-            border-radius: 50%;
-            background: #e8b4b8;
-            cursor: pointer;
-            box-shadow: 0 0 6px rgba(232,180,184,0.6);
-        }
-        .timeline-slider::-moz-range-thumb {
-            width: 16px; height: 16px;
-            border-radius: 50%;
-            background: #e8b4b8;
-            cursor: pointer;
-            border: none;
-        }
+        .timeline-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #e8b4b8; cursor: pointer; box-shadow: 0 0 6px rgba(232,180,184,0.5); }
+        .timeline-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #e8b4b8; cursor: pointer; border: none; }
 
-        /* Control Buttons Row */
-        .controls-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* Buttons Row */
+        .controls-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
         .ctrl-btn {
-            background: #1e1e2e;
-            border: none;
-            color: #fff;
-            padding: 7px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #1a1a2e; border: none; color: #fff;
+            padding: 7px 11px; border-radius: 6px; cursor: pointer;
+            font-size: 16px; transition: 0.15s; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
         }
-        .ctrl-btn:hover { background: #2e2e4e; }
-        .ctrl-btn:active { transform: scale(0.94); }
+        .ctrl-btn:hover { background: #2a2a44; }
+        .ctrl-btn:active { transform: scale(0.93); }
 
-        .vol-wrap {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .vol-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 80px;
-            height: 4px;
-            background: #2e2e4e;
-            border-radius: 4px;
-            outline: none;
-            cursor: pointer;
-        }
-        .vol-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 13px; height: 13px;
-            border-radius: 50%;
-            background: #e8b4b8;
-            cursor: pointer;
-        }
+        .vol-wrap { display: flex; align-items: center; gap: 5px; }
+        .vol-slider { -webkit-appearance: none; appearance: none; width: 70px; height: 4px; background: #2a2a40; border-radius: 4px; outline: none; cursor: pointer; }
+        .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #e8b4b8; cursor: pointer; }
+        .vol-slider::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #e8b4b8; cursor: pointer; border: none; }
 
         .spacer { flex: 1; }
 
-        /* ── SPEED SELECTOR ── */
-        .speed-select {
-            background: #1e1e2e;
-            color: #fff;
-            border: 1px solid #2e2e4e;
-            border-radius: 6px;
-            padding: 6px 8px;
-            font-size: 13px;
-            cursor: pointer;
-            outline: none;
-        }
-        .speed-select:focus { border-color: #e8b4b8; }
+        .speed-select { background: #1a1a2e; color: #fff; border: 1px solid #2a2a44; border-radius: 6px; padding: 6px 6px; font-size: 13px; cursor: pointer; outline: none; }
 
         /* ── SETTINGS PANEL ── */
         .settings-wrap { position: relative; }
-
         .settings-panel {
-            display: none;
-            position: absolute;
-            bottom: 46px;
-            right: 0;
-            background: #12121f;
-            border: 1px solid #2e2e4e;
-            border-radius: 10px;
-            padding: 16px;
-            min-width: 260px;
-            z-index: 100;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            display: none; position: absolute; bottom: 46px; right: 0;
+            background: #12121f; border: 1px solid #2a2a40; border-radius: 10px;
+            padding: 16px; min-width: 260px; z-index: 200;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.7);
         }
         .settings-panel.open { display: block; }
-
-        .settings-panel h3 {
-            font-size: 13px;
-            color: #e8b4b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
-        }
+        .settings-panel h3 { font-size: 12px; color: #e8b4b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
 
         .setting-group { margin-bottom: 16px; }
-        .setting-group label {
-            display: block;
-            font-size: 13px;
-            color: #aaa;
-            margin-bottom: 6px;
-        }
-        .setting-group span {
-            color: #fff;
-            font-weight: 600;
-        }
+        .setting-group > label { display: block; font-size: 13px; color: #999; margin-bottom: 8px; }
+        .setting-group > label span { color: #fff; font-weight: 700; }
 
-        /* Quality Buttons */
-        .quality-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-        }
+        .q-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .q-btn {
-            background: #1e1e2e;
-            border: 1.5px solid #2e2e4e;
-            color: #ccc;
-            padding: 8px 4px;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.2s;
+            background: #1a1a2e; border: 1.5px solid #2a2a44; color: #bbb;
+            padding: 8px 4px; border-radius: 7px; font-size: 13px; font-weight: 600;
+            cursor: pointer; text-align: center; transition: 0.15s; line-height: 1.3;
         }
-        .q-btn:hover { background: #2e2e4e; color: #fff; }
-        .q-btn.active {
-            border-color: #e8b4b8;
-            color: #e8b4b8;
-            background: rgba(232,180,184,0.1);
-        }
-        .q-desc {
-            font-size: 11px;
-            color: #666;
-            display: block;
-            margin-top: 2px;
-        }
+        .q-btn small { font-size: 10px; color: #555; display: block; margin-top: 2px; font-weight: 400; }
+        .q-btn:hover { background: #2a2a44; color: #fff; }
+        .q-btn.active { border-color: #e8b4b8; color: #e8b4b8; background: rgba(232,180,184,0.08); }
 
-        /* Theme row */
-        .theme-row {
-            display: flex;
-            gap: 6px;
-        }
-        .theme-dot {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: 0.2s;
-        }
-        .theme-dot.active { border-color: #fff; transform: scale(1.2); }
+        .loop-row { display: flex; align-items: center; justify-content: space-between; }
+        .loop-row label { font-size: 13px; color: #999; }
+        .toggle-wrap { display: flex; align-items: center; gap: 8px; }
 
-        /* ── LINK INPUT ── */
-        .link-section {
-            margin-top: 18px;
-            background: #12121f;
-            border: 1px solid #1e1e2e;
-            border-radius: 10px;
-            padding: 16px;
-        }
-        .link-section h2 {
-            font-size: 15px;
-            color: #e8b4b8;
-            margin-bottom: 12px;
-        }
-        .link-row {
-            display: flex;
-            gap: 8px;
-        }
-        .link-input {
-            flex: 1;
-            background: #0a0a0f;
-            border: 1.5px solid #2e2e4e;
-            color: #fff;
-            padding: 10px 14px;
-            border-radius: 7px;
-            font-size: 13px;
-            outline: none;
-            transition: 0.2s;
-        }
+        /* ── LINK SECTION ── */
+        .link-section { margin-top: 16px; background: #10101c; border: 1px solid #1e1e2e; border-radius: 10px; padding: 14px 16px; }
+        .link-section h2 { font-size: 14px; color: #e8b4b8; margin-bottom: 10px; }
+        .link-row { display: flex; gap: 8px; }
+        .link-input { flex: 1; background: #0a0a0f; border: 1.5px solid #2a2a44; color: #fff; padding: 9px 12px; border-radius: 7px; font-size: 13px; outline: none; transition: 0.2s; }
         .link-input:focus { border-color: #e8b4b8; }
-        .link-input::placeholder { color: #555; }
-        .load-btn {
-            background: #e8b4b8;
-            color: #0a0a0f;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 7px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
+        .link-input::placeholder { color: #444; }
+        .load-btn { background: #e8b4b8; color: #0a0a0f; border: none; padding: 9px 16px; border-radius: 7px; font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .load-btn:hover { background: #f0c8cc; }
-        .link-hint {
-            font-size: 12px;
-            color: #555;
-            margin-top: 8px;
-        }
+        .link-hint { font-size: 11px; color: #444; margin-top: 7px; }
 
         /* ── MOVIE INFO ── */
-        .movie-info {
-            margin-top: 18px;
-            padding-bottom: 40px;
-        }
-        .movie-info h1 { font-size: 22px; color: #eee; margin-bottom: 6px; }
-        .movie-info p { color: #888; font-size: 14px; line-height: 1.6; }
-        .action-row { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .action-btn {
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-rotate { background: #e8b4b8; color: #0a0a0f; }
-        .btn-refresh { background: #1e1e2e; color: #aaa; }
-        .btn-rotate:hover, .btn-refresh:hover { opacity: 0.85; }
+        .movie-info { margin-top: 16px; padding-bottom: 40px; }
+        .movie-info h1 { font-size: 20px; color: #eee; margin-bottom: 5px; }
+        .action-row { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .action-btn { padding: 9px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-fs { background: #e8b4b8; color: #0a0a0f; }
+        .btn-ref { background: #1a1a2e; color: #aaa; }
 
         /* ── TOAST ── */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: #e8b4b8;
-            color: #0a0a0f;
-            padding: 10px 22px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 600;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s;
-            z-index: 9999;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(16px); background: #e8b4b8; color: #0a0a0f; padding: 9px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.28s; z-index: 9999; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* Mobile tweaks */
+        /* ── LOADING OVERLAY ── */
+        .loading-overlay {
+            display: none;
+            position: absolute; inset: 0;
+            background: rgba(10,10,15,0.85);
+            border-radius: 10px 10px 0 0;
+            z-index: 10;
+            align-items: center; justify-content: center;
+            flex-direction: column; gap: 12px;
+        }
+        .loading-overlay.show { display: flex; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #2a2a44; border-top-color: #e8b4b8; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-overlay p { color: #e8b4b8; font-size: 13px; }
+
         @media (max-width: 480px) {
-            .vol-slider { width: 55px; }
-            .settings-panel { min-width: 220px; right: -10px; }
-            .quality-grid { grid-template-columns: repeat(2, 1fr); }
+            .vol-slider { width: 50px; }
+            .settings-panel { min-width: 230px; right: -8px; }
+            .q-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -389,49 +155,50 @@
 
 <div class="player-section">
 
-    <!-- VIDEO PLAYER -->
+    <!-- VIDEO -->
     <div class="video-wrapper" id="v-wrapper">
-        <iframe
-            id="main-frame"
-            src="https://drive.google.com/file/d/1F9RJr4H8E_T5pfFZOFWSrwiJUD8SMWR8/preview"
-            allow="autoplay; fullscreen"
-            allowfullscreen>
-        </iframe>
-        <div class="ui-blocker"></div>
-        <div class="ui-blocker-bottom"></div>
+        <div class="loading-overlay" id="loader">
+            <div class="spinner"></div>
+            <p>Video load වෙනවා...</p>
+        </div>
+        <video id="vid" playsinline autoplay>
+            <source id="vid-src" src="" type="video/mp4">
+        </video>
     </div>
 
-    <!-- CONTROLS BAR -->
+    <!-- CONTROLS -->
     <div class="controls-bar">
 
         <!-- Timeline -->
         <div class="timeline-wrap">
-            <span class="time-label" id="time-display">0:00 / --:--</span>
-            <input type="range" class="timeline-slider" id="timeline" value="0" min="0" max="100" step="0.1">
+            <span class="time-label" id="cur-time">0:00</span>
+            <input type="range" class="timeline-slider" id="timeline" value="0" min="0" max="100" step="0.01">
+            <span class="time-label" id="dur-time">--:--</span>
         </div>
 
-        <!-- Buttons Row -->
         <div class="controls-row">
+
             <!-- Play/Pause -->
-            <button class="ctrl-btn" id="play-btn" onclick="togglePlay()" title="Play / Pause">▶</button>
+            <button class="ctrl-btn" id="play-btn" onclick="togglePlay()">▶</button>
 
             <!-- Stop -->
-            <button class="ctrl-btn" onclick="stopVideo()" title="Stop">⏹</button>
+            <button class="ctrl-btn" onclick="stopVideo()">⏹</button>
 
-            <!-- Rewind 10s -->
-            <button class="ctrl-btn" onclick="seekRel(-10)" title="10 sec back">⏪</button>
+            <!-- -10s -->
+            <button class="ctrl-btn" onclick="seekRel(-10)">⏪</button>
 
-            <!-- Forward 10s -->
-            <button class="ctrl-btn" onclick="seekRel(10)" title="10 sec forward">⏩</button>
+            <!-- +10s -->
+            <button class="ctrl-btn" onclick="seekRel(10)">⏩</button>
 
             <!-- Volume -->
             <div class="vol-wrap">
-                <button class="ctrl-btn" onclick="toggleMute()" id="mute-btn" title="Mute">🔊</button>
+                <button class="ctrl-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
                 <input type="range" class="vol-slider" id="vol-slider" value="100" min="0" max="100" oninput="setVolume(this.value)">
             </div>
 
             <!-- Speed -->
-            <select class="speed-select" onchange="setSpeed(this.value)" title="Playback Speed">
+            <select class="speed-select" onchange="setSpeed(this.value)">
+                <option value="0.25">0.25×</option>
                 <option value="0.5">0.5×</option>
                 <option value="0.75">0.75×</option>
                 <option value="1" selected>1×</option>
@@ -444,325 +211,312 @@
 
             <!-- Settings -->
             <div class="settings-wrap">
-                <button class="ctrl-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
-
+                <button class="ctrl-btn" onclick="toggleSettings()">⚙️</button>
                 <div class="settings-panel" id="settings-panel">
                     <h3>⚙️ Settings</h3>
 
                     <!-- Quality -->
                     <div class="setting-group">
-                        <label>🎥 Video Quality — දැනට: <span id="quality-label">Auto</span></label>
-                        <div class="quality-grid">
-                            <button class="q-btn active" onclick="setQuality('Auto','auto')">
-                                Auto <span class="q-desc">නිර්දේශ</span>
-                            </button>
-                            <button class="q-btn" onclick="setQuality('1080p','1080')">
-                                1080p <span class="q-desc">Full HD</span>
-                            </button>
-                            <button class="q-btn" onclick="setQuality('720p','720')">
-                                720p <span class="q-desc">HD</span>
-                            </button>
-                            <button class="q-btn" onclick="setQuality('480p','480')">
-                                480p <span class="q-desc">සාමාන්‍ය</span>
-                            </button>
-                            <button class="q-btn" onclick="setQuality('360p','360')">
-                                360p <span class="q-desc">Slow net</span>
-                            </button>
-                            <button class="q-btn" onclick="setQuality('240p','240')">
-                                240p <span class="q-desc">ඉතා Slow</span>
-                            </button>
+                        <label>🎥 Quality — <span id="q-label">Auto</span></label>
+                        <div class="q-grid" id="q-grid">
+                            <button class="q-btn active" onclick="setQuality(this,'auto')">Auto<small>නිර්දේශ</small></button>
+                            <button class="q-btn" onclick="setQuality(this,'1080p')">1080p<small>Full HD</small></button>
+                            <button class="q-btn" onclick="setQuality(this,'720p')">720p<small>HD</small></button>
+                            <button class="q-btn" onclick="setQuality(this,'480p')">480p<small>සාමාන්‍ය</small></button>
+                            <button class="q-btn" onclick="setQuality(this,'360p')">360p<small>Slow net</small></button>
+                            <button class="q-btn" onclick="setQuality(this,'240p')">240p<small>ඉතා Slow</small></button>
                         </div>
-                        <p style="font-size:11px;color:#555;margin-top:8px;">
-                            ⚠️ Google Drive හරහා Quality change Drive player ඇතුළේ කළ යුතුය. මෙය ඔබේ preference save කරයි.
+                        <p style="font-size:11px;color:#444;margin-top:8px;">
+                            💡 Quality change වෙද්දී video eka ටිකක් reload වෙනවා — ඔබ නිතරාවූ ස්ථානයෙන්ම continue වෙනවා.
                         </p>
                     </div>
 
-                    <!-- Aspect Ratio -->
+                    <!-- Aspect -->
                     <div class="setting-group">
                         <label>📐 Aspect Ratio</label>
-                        <div class="quality-grid">
-                            <button class="q-btn active" onclick="setAspect('16/9')">16:9</button>
-                            <button class="q-btn" onclick="setAspect('4/3')">4:3</button>
-                            <button class="q-btn" onclick="setAspect('21/9')">21:9</button>
+                        <div class="q-grid" id="asp-grid">
+                            <button class="q-btn active" onclick="setAspect(this,'16/9')">16:9</button>
+                            <button class="q-btn" onclick="setAspect(this,'4/3')">4:3</button>
+                            <button class="q-btn" onclick="setAspect(this,'21/9')">21:9</button>
                         </div>
                     </div>
 
-                    <!-- Autoplay -->
-                    <div class="setting-group" style="display:flex;align-items:center;justify-content:space-between;">
-                        <label style="margin:0">🔁 Loop Video</label>
-                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                            <input type="checkbox" id="loop-check" onchange="toggleLoop(this.checked)" style="width:18px;height:18px;cursor:pointer;accent-color:#e8b4b8;">
-                            <span id="loop-label" style="color:#aaa;font-size:13px;">Off</span>
-                        </label>
+                    <!-- Loop -->
+                    <div class="loop-row">
+                        <label>🔁 Loop</label>
+                        <div class="toggle-wrap">
+                            <input type="checkbox" id="loop-chk" onchange="toggleLoop(this.checked)" style="width:18px;height:18px;accent-color:#e8b4b8;cursor:pointer;">
+                            <span id="loop-lbl" style="font-size:13px;color:#666;">Off</span>
+                        </div>
                     </div>
-
                 </div>
             </div>
 
             <!-- Fullscreen -->
-            <button class="ctrl-btn" onclick="goFullscreen()" title="Fullscreen">⛶</button>
+            <button class="ctrl-btn" onclick="goFS()">⛶</button>
         </div>
     </div>
 
-    <!-- LINK INPUT SECTION -->
+    <!-- LINK INPUT -->
     <div class="link-section">
         <h2>📎 Google Drive Video Link දාන්න</h2>
         <div class="link-row">
-            <input type="text"
-                class="link-input"
-                id="link-input"
-                placeholder="https://drive.google.com/file/d/FILE_ID/view  හෝ  FILE_ID">
-            <button class="load-btn" onclick="loadVideo()">Load ▶</button>
+            <input type="text" class="link-input" id="link-input"
+                placeholder="https://drive.google.com/file/d/FILE_ID/view">
+            <button class="load-btn" onclick="loadVideo()">▶ Load</button>
         </div>
-        <p class="link-hint">
-            💡 Drive link paste කරන්න — sharing "Anyone with link" on කර තිබිය යුතුයි
-        </p>
+        <p class="link-hint">💡 Drive → Share → "Anyone with link" → Copy link → Paste here</p>
     </div>
 
     <!-- MOVIE INFO -->
     <div class="movie-info">
-        <h1 id="movie-title">නරඹන චිත්‍රපටය</h1>
-        <p id="movie-desc">Google Drive video link ඉහලින් දාලා Load කරන්න. ⬆️</p>
+        <h1>නරඹන චිත්‍රපටය</h1>
         <div class="action-row">
-            <button class="action-btn btn-rotate" onclick="goFullscreenRotate()">📱 Rotate & Fullscreen</button>
-            <button class="action-btn btn-refresh" onclick="location.reload()">🔄 Refresh Player</button>
+            <button class="action-btn btn-fs" onclick="goFSRotate()">📱 Rotate & Fullscreen</button>
+            <button class="action-btn btn-ref" onclick="location.reload()">🔄 Refresh</button>
         </div>
     </div>
 
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-    // ── State ──
-    let isPlaying = false;
-    let isMuted = false;
-    let currentQuality = 'Auto';
-    let loopEnabled = false;
-    let progressTimer = null;
+    const vid   = document.getElementById('vid');
+    const src   = document.getElementById('vid-src');
+    const tl    = document.getElementById('timeline');
+    const curT  = document.getElementById('cur-time');
+    const durT  = document.getElementById('dur-time');
+    const playB = document.getElementById('play-btn');
+    const muteB = document.getElementById('mute-btn');
+    const volS  = document.getElementById('vol-slider');
+    const loader= document.getElementById('loader');
+
+    let currentFileId = '1F9RJr4H8E_T5pfFZOFWSrwiJUD8SMWR8';
+    let currentQuality = 'auto';
+    let savedTime = 0;
+
+    // Quality → Google Drive direct stream URL param
+    // itm=x means: drive returns the video file directly (not the preview page)
+    const qualityParam = {
+        'auto':  '',
+        '1080p': '&itm=0&export=download', // fallback — drive picks best
+        '720p':  '&itm=0&export=download',
+        '480p':  '&itm=0&export=download',
+        '360p':  '&itm=0&export=download',
+        '240p':  '&itm=0&export=download',
+    };
+
+    function driveDirectURL(fileId) {
+        // Google Drive direct video stream link
+        return `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`;
+    }
 
     // ── Toast ──
-    function showToast(msg, dur = 2200) {
+    function showToast(msg, dur=2000) {
         const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.add('show');
+        t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), dur);
     }
 
-    // ── Load Video from Drive Link ──
+    // ── Time Format ──
+    function fmt(s) {
+        if (isNaN(s) || s < 0) return '--:--';
+        s = Math.floor(s);
+        const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+        const p = n => n<10?'0'+n:n;
+        return h>0 ? `${h}:${p(m)}:${p(sec)}` : `${m}:${p(sec)}`;
+    }
+
+    // ── Load Video ──
     function loadVideo() {
         const raw = document.getElementById('link-input').value.trim();
         if (!raw) { showToast('⚠️ Link එකක් දාන්න!'); return; }
 
         let fileId = '';
-
-        // Pattern: /file/d/FILE_ID/
         const m1 = raw.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-        if (m1) { fileId = m1[1]; }
-        // Pattern: id=FILE_ID
+        if (m1) fileId = m1[1];
         else {
             const m2 = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-            if (m2) { fileId = m2[1]; }
-            // Raw ID
-            else if (/^[a-zA-Z0-9_-]{25,}$/.test(raw)) { fileId = raw; }
+            if (m2) fileId = m2[1];
+            else if (/^[a-zA-Z0-9_-]{25,}$/.test(raw)) fileId = raw;
         }
 
-        if (!fileId) { showToast('❌ Valid Drive link එකක් දාන්න!'); return; }
-
-        const embedUrl = `https://drive.google.com/file/d/${fileId}/preview?autoplay=1`;
-        document.getElementById('main-frame').src = embedUrl;
-        isPlaying = true;
-        document.getElementById('play-btn').textContent = '⏸';
-        showToast('✅ Video load වෙනවා...');
-        resetTimeline();
+        if (!fileId) { showToast('❌ Valid Drive link දාන්න!'); return; }
+        currentFileId = fileId;
+        applySource(0);
+        showToast('✅ Loading...');
     }
 
-    // Enter key support
     document.getElementById('link-input').addEventListener('keydown', e => {
         if (e.key === 'Enter') loadVideo();
     });
 
-    // ── Play / Pause (message to iframe) ──
-    function togglePlay() {
-        const frame = document.getElementById('main-frame');
-        // Drive iframe postMessage support is limited — we reload with/without autoplay
-        isPlaying = !isPlaying;
-        document.getElementById('play-btn').textContent = isPlaying ? '⏸' : '▶';
-        if (isPlaying) {
-            showToast('▶ Playing');
-            startFakeProgress();
-        } else {
-            showToast('⏸ Paused');
-            stopFakeProgress();
-        }
+    function applySource(resumeAt) {
+        savedTime = resumeAt || 0;
+        loader.classList.add('show');
+        const url = driveDirectURL(currentFileId);
+        vid.pause();
+        src.src = url;
+        vid.load();
+        vid.oncanplay = () => {
+            loader.classList.remove('show');
+            vid.currentTime = savedTime;
+            vid.play().then(() => {
+                playB.textContent = '⏸';
+            }).catch(() => {
+                playB.textContent = '▶';
+            });
+        };
+        vid.onerror = () => {
+            loader.classList.remove('show');
+            showToast('⚠️ Drive direct stream fail — iframe fallback', 3000);
+            // Fallback to iframe preview
+            useFallbackIframe();
+        };
     }
 
-    // ── Stop ──
+    // Fallback to iframe if direct stream blocked
+    function useFallbackIframe() {
+        const wrapper = document.getElementById('v-wrapper');
+        // Remove video element, add iframe
+        vid.style.display = 'none';
+        let existing = document.getElementById('fb-frame');
+        if (!existing) {
+            const fr = document.createElement('iframe');
+            fr.id = 'fb-frame';
+            fr.style.cssText = 'width:100%;height:100%;border:none;position:absolute;top:0;left:0;';
+            fr.allow = 'autoplay; fullscreen';
+            fr.allowFullscreen = true;
+            wrapper.appendChild(fr);
+        }
+        document.getElementById('fb-frame').src =
+            `https://drive.google.com/file/d/${currentFileId}/preview?autoplay=1`;
+        showToast('📺 Drive player mode', 2500);
+    }
+
+    // ── Video Events ──
+    vid.addEventListener('timeupdate', () => {
+        if (!vid.duration) return;
+        const pct = (vid.currentTime / vid.duration) * 100;
+        tl.value = pct;
+        curT.textContent = fmt(vid.currentTime);
+        durT.textContent = fmt(vid.duration);
+    });
+
+    vid.addEventListener('loadedmetadata', () => {
+        durT.textContent = fmt(vid.duration);
+    });
+
+    vid.addEventListener('waiting', () => loader.classList.add('show'));
+    vid.addEventListener('playing', () => loader.classList.remove('show'));
+    vid.addEventListener('ended', () => {
+        if (document.getElementById('loop-chk').checked) {
+            vid.currentTime = 0; vid.play();
+        } else {
+            playB.textContent = '▶';
+        }
+    });
+
+    // Timeline scrub
+    tl.addEventListener('input', () => {
+        if (vid.duration) {
+            vid.currentTime = (tl.value / 100) * vid.duration;
+        }
+    });
+
+    // ── Controls ──
+    function togglePlay() {
+        if (vid.paused) { vid.play(); playB.textContent = '⏸'; }
+        else { vid.pause(); playB.textContent = '▶'; }
+    }
+
     function stopVideo() {
-        const frame = document.getElementById('main-frame');
-        const src = frame.src.split('?')[0];
-        frame.src = src + '?autoplay=0';
-        isPlaying = false;
-        document.getElementById('play-btn').textContent = '▶';
-        resetTimeline();
+        vid.pause(); vid.currentTime = 0;
+        playB.textContent = '▶';
         showToast('⏹ Stopped');
     }
 
-    // ── Seek (relative, fake for Drive) ──
     function seekRel(sec) {
-        const slider = document.getElementById('timeline');
-        const newVal = Math.max(0, Math.min(100, parseFloat(slider.value) + sec));
-        slider.value = newVal;
-        updateTimeLabel(newVal);
-        showToast(`${sec > 0 ? '+' : ''}${sec}s`);
+        vid.currentTime = Math.max(0, Math.min(vid.duration || 0, vid.currentTime + sec));
+        showToast(`${sec>0?'+':''}${sec}s`);
     }
 
-    // ── Volume ──
     function setVolume(val) {
-        // Drive iframes don't expose postMessage volume, but we show UI feedback
-        isMuted = (val == 0);
-        document.getElementById('mute-btn').textContent = val == 0 ? '🔇' : val < 50 ? '🔉' : '🔊';
+        vid.volume = val / 100;
+        vid.muted = (val == 0);
+        muteB.textContent = val == 0 ? '🔇' : val < 50 ? '🔉' : '🔊';
     }
 
     function toggleMute() {
-        const slider = document.getElementById('vol-slider');
-        if (!isMuted) {
-            slider.value = 0;
-            document.getElementById('mute-btn').textContent = '🔇';
-            isMuted = true;
-        } else {
-            slider.value = 100;
-            document.getElementById('mute-btn').textContent = '🔊';
-            isMuted = false;
-        }
-        showToast(isMuted ? '🔇 Muted' : '🔊 Unmuted');
+        vid.muted = !vid.muted;
+        if (vid.muted) { volS.value = 0; muteB.textContent = '🔇'; }
+        else { volS.value = vid.volume * 100; muteB.textContent = '🔊'; }
+        showToast(vid.muted ? '🔇 Muted' : '🔊 Unmuted');
     }
 
-    // ── Speed ──
     function setSpeed(val) {
-        showToast(`⏱ Speed: ${val}×`);
-        // Note: Drive iframe doesn't support postMessage speed control
+        vid.playbackRate = parseFloat(val);
+        showToast(`⏱ ${val}×`);
     }
 
-    // ── Quality ──
-    function setQuality(label, val) {
-        currentQuality = label;
-        document.getElementById('quality-label').textContent = label;
-        document.querySelectorAll('.q-btn').forEach(b => {
-            if (b.textContent.startsWith(label)) b.classList.add('active');
-            else if (b.querySelector('.q-desc') && b.textContent.trim().startsWith(label.replace('p',''))) b.classList.add('active');
-        });
-        // Re-trigger active state cleanly
-        document.querySelectorAll('.quality-grid .q-btn').forEach(b => b.classList.remove('active'));
-        event.target.closest('.q-btn').classList.add('active');
-        showToast(`🎥 Quality: ${label} — Drive player ඇතුළේ change කරන්න`);
+    // ── Quality (reload from same time) ──
+    function setQuality(btn, q) {
+        currentQuality = q;
+        document.querySelectorAll('#q-grid .q-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const label = q === 'auto' ? 'Auto' : q;
+        document.getElementById('q-label').textContent = label;
+
+        // Save current time, reload
+        savedTime = vid.currentTime || 0;
+        applySource(savedTime);
+        showToast(`🎥 Quality: ${label}`);
+        document.getElementById('settings-panel').classList.remove('open');
     }
 
     // ── Aspect Ratio ──
-    function setAspect(ratio) {
+    function setAspect(btn, ratio) {
         document.getElementById('v-wrapper').style.aspectRatio = ratio;
-        // Update active
-        document.querySelectorAll('.setting-group:nth-child(2) .q-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        showToast(`📐 Aspect: ${ratio}`);
+        document.querySelectorAll('#asp-grid .q-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showToast(`📐 ${ratio}`);
     }
 
     // ── Loop ──
     function toggleLoop(checked) {
-        loopEnabled = checked;
-        document.getElementById('loop-label').textContent = checked ? 'On' : 'Off';
+        vid.loop = checked;
+        document.getElementById('loop-lbl').textContent = checked ? 'On' : 'Off';
         showToast(checked ? '🔁 Loop On' : '🔁 Loop Off');
     }
 
-    // ── Settings Panel ──
+    // ── Settings ──
     function toggleSettings() {
         document.getElementById('settings-panel').classList.toggle('open');
     }
-    // Close settings on outside click
     document.addEventListener('click', e => {
-        const panel = document.getElementById('settings-panel');
-        const wrap = document.querySelector('.settings-wrap');
-        if (!wrap.contains(e.target)) panel.classList.remove('open');
+        const w = document.querySelector('.settings-wrap');
+        if (!w.contains(e.target)) document.getElementById('settings-panel').classList.remove('open');
     });
 
     // ── Fullscreen ──
-    function goFullscreen() {
-        const wrapper = document.getElementById('v-wrapper');
-        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-        showToast('⛶ Fullscreen');
+    function goFS() {
+        const w = document.getElementById('v-wrapper');
+        if (w.requestFullscreen) w.requestFullscreen();
+        else if (w.webkitRequestFullscreen) w.webkitRequestFullscreen();
     }
-
-    function goFullscreenRotate() {
-        const wrapper = document.getElementById('v-wrapper');
-        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-        if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(() => {});
-        }
+    function goFSRotate() {
+        goFS();
+        if (screen.orientation && screen.orientation.lock)
+            screen.orientation.lock('landscape').catch(()=>{});
     }
-
     document.addEventListener('fullscreenchange', () => {
-        if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+        if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock)
             screen.orientation.unlock();
-        }
     });
 
-    // ── Timeline Fake Progress ──
-    let fakeTime = 0;
-    const FAKE_DURATION = 7200; // 2hr default
-
-    function startFakeProgress() {
-        stopFakeProgress();
-        progressTimer = setInterval(() => {
-            fakeTime++;
-            const pct = (fakeTime / FAKE_DURATION) * 100;
-            document.getElementById('timeline').value = Math.min(pct, 100);
-            updateTimeLabel(pct);
-            if (loopEnabled && fakeTime >= FAKE_DURATION) {
-                fakeTime = 0;
-                showToast('🔁 Loop restarted');
-            }
-        }, 1000);
-    }
-
-    function stopFakeProgress() {
-        if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
-    }
-
-    function resetTimeline() {
-        fakeTime = 0;
-        stopFakeProgress();
-        document.getElementById('timeline').value = 0;
-        document.getElementById('time-display').textContent = '0:00 / --:--';
-    }
-
-    function updateTimeLabel(pct) {
-        const secs = Math.floor((pct / 100) * FAKE_DURATION);
-        document.getElementById('time-display').textContent =
-            `${fmt(secs)} / ${fmt(FAKE_DURATION)}`;
-    }
-
-    function fmt(s) {
-        const h = Math.floor(s / 3600);
-        const m = Math.floor((s % 3600) / 60);
-        const sec = s % 60;
-        if (h > 0) return `${h}:${pad(m)}:${pad(sec)}`;
-        return `${m}:${pad(sec)}`;
-    }
-    function pad(n) { return n < 10 ? '0' + n : n; }
-
-    // Manual timeline scrub
-    document.getElementById('timeline').addEventListener('input', function() {
-        fakeTime = Math.floor((this.value / 100) * FAKE_DURATION);
-        updateTimeLabel(parseFloat(this.value));
-    });
-
-    // Auto-start progress on load
-    isPlaying = true;
-    document.getElementById('play-btn').textContent = '⏸';
-    startFakeProgress();
+    // ── Auto-load default video ──
+    applySource(0);
 </script>
 
 </body>
