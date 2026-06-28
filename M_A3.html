@@ -1,158 +1,558 @@
 <!DOCTYPE html>
 <html lang="si">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player | Lakmina Cinema</title>
-    <style>
-        /* මූලික සැකසුම් */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #232769; color: rgb(43, 41, 187); overflow-x: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Video Player</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Navbar */
-        .navbar {
-            padding: 15px 5%; background: rgba(0,0,0,0.9);
-            display: flex; justify-content: space-between; align-items: center;
-            position: fixed; width: 100%; z-index: 1000;
-        }
-        .logo { color: #ffffff; font-size: 22px; font-weight: bold; text-decoration: none; }
-        .back-btn { color: white; text-decoration: none; background: #333; padding: 6px 15px; border-radius: 4px; font-size: 14px; }
+  :root {
+    --accent: #4f8ef7;
+    --bg: #0d0d0d;
+    --card: #161622;
+    --border: rgba(255,255,255,0.09);
+    --text: #e8e8f0;
+    --muted: #666;
+  }
 
-        /* Video Container */
-        .player-section {
-            padding-top: 100px;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding-left: 10px; padding-right: 10px;
-        }
+  html, body {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
 
-        /* Video Box */
-        .video-box {
-            position: relative;
-            padding-bottom: 56.25%; 
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-            background: #000;
-            box-shadow: 0 0 20px rgba(255, 187, 191, 0.2);
-        }
+  /* ── VIDEO CONTAINER ── */
+  .video-outer {
+    position: relative;
+    width: 100%;
+    background: #000;
+  }
 
-        #player {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border: none;
-        }
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #000;
+  }
+  .video-wrap iframe {
+    position: absolute;
+    inset: 0; width: 100%; height: 100%;
+    border: none;
+    pointer-events: none; /* prevent iframe from capturing clicks */
+  }
 
-        /* --- මාරක ලේයර් එක (සියලුම Click බ්ලොක් කරයි) --- */
-        .click-blocker {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%; 
-            z-index: 20;
-            background: transparent;
-            cursor: default;
-        }
+  /* ── CLICK OVERLAY → opens YouTube ── */
+  .yt-link-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    cursor: pointer;
+    background: transparent;
+  }
 
-        /* Movie Details */
-        .movie-details {
-            margin-top: 25px;
-            padding-bottom: 50px;
-        }
+  /* ── FAKE CONTROLS BAR (matches image style) ── */
+  .fake-controls {
+    background: rgba(18,18,18,0.97);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    position: relative;
+    z-index: 5;
+  }
 
-        .movie-details h1 { font-size: 26px; color: #cecece; margin-bottom: 10px; }
-        .movie-details p { color: #ccc; line-height: 1.6; font-size: 15px; }
+  /* Red dot / record icon */
+  .ctrl-red-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e53935;
+    flex-shrink: 0;
+  }
 
-        .btn-group { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn {
-            padding: 12px 20px; border-radius: 5px; text-decoration: none; 
-            font-weight: bold; display: inline-block; transition: 0.3s;
-            cursor: pointer; border: none; font-size: 14px;
-        }
-        .btn-play { background: #662207; color: white; }
-        .btn-rotate { background: #fbc02d; color: rgb(0, 0, 0); }
-        
-        .btn:hover { opacity: 0.8; }
+  /* Play button */
+  .ctrl-play {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .ctrl-play:hover { background: rgba(255,255,255,0.2); }
+  .ctrl-play svg { width: 12px; height: 12px; fill: #fff; margin-left: 1px; }
 
-        @media (min-width: 800px) {
-            .player-section { padding-top: 120px; }
-            .movie-details h1 { font-size: 35px; }
-        }
-    </style>
+  /* Volume icon */
+  .ctrl-vol {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .ctrl-vol svg { width: 18px; height: 18px; fill: #fff; }
+
+  /* Volume bar (the two horizontal lines in image) */
+  .ctrl-vol-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+  .ctrl-vol-bar span {
+    display: block;
+    height: 2.5px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ctrl-vol-bar span:first-child { width: 22px; }
+  .ctrl-vol-bar span:last-child  { width: 14px; }
+
+  /* Time display */
+  .ctrl-time {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Progress bar area */
+  .ctrl-progress {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 99px;
+    position: relative;
+    overflow: visible;
+  }
+  .ctrl-progress-fill {
+    height: 100%;
+    width: 1.5%;
+    background: #e53935;
+    border-radius: 99px;
+    position: relative;
+  }
+  .ctrl-progress-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e53935;
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 0 2px rgba(229,57,53,0.3);
+  }
+
+  /* Right side icons */
+  .ctrl-icons-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .ctrl-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.65;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .ctrl-icon:hover { opacity: 1; }
+  .ctrl-icon svg { width: 18px; height: 18px; fill: #fff; }
+
+  /* YouTube button (special) */
+  .ctrl-yt-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s;
+  }
+  .ctrl-yt-btn:hover { background: rgba(255,0,0,0.25); color: #fff; }
+  .ctrl-yt-btn svg { width: 14px; height: 14px; fill: #ff0000; }
+
+  /* Fullscreen icon */
+  .ctrl-fullscreen {
+    cursor: pointer;
+  }
+
+  /* Settings gear */
+  .ctrl-gear svg {
+    width: 16px; height: 16px;
+  }
+
+  /* ── TIPS BAR below controls ── */
+  .tips-bar {
+    background: #111118;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .tip-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #888;
+    line-height: 1.5;
+  }
+  .tip-row .tip-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .tip-row span b { color: #bbb; font-weight: 600; }
+
+  /* ── BELOW VIDEO ── */
+  .below-video {
+    padding: 14px 14px 48px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── MESSAGE CARD ── */
+  .msg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px 16px;
+  }
+
+  .msg-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .msg-header .emoji { font-size: 20px; }
+  .msg-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+
+  .progress-dots { display: flex; gap: 5px; margin-bottom: 14px; }
+  .dot {
+    height: 3px; border-radius: 99px;
+    background: rgba(255,255,255,0.1); flex: 1; transition: background 0.35s;
+  }
+  .dot.done { background: var(--accent); }
+
+  .step { display: none; flex-direction: column; gap: 10px; animation: fadeUp 0.22s ease; }
+  .step.active { display: flex; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(6px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .step-label { font-size: 13px; color: var(--muted); }
+
+  input[type="text"], input[type="tel"], textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: #444; }
+
+  .btn-row { display: flex; gap: 8px; }
+
+  .btn-next {
+    flex: 1;
+    background: var(--accent);
+    border: none;
+    border-radius: 11px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-next:active { transform: scale(0.97); opacity: 0.88; }
+
+  .btn-skip {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 13px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-skip:active { background: rgba(255,255,255,0.12); }
+
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success-msg { text-align: center; padding: 12px 0 6px; }
+  .success-msg .s-icon { font-size: 42px; margin-bottom: 10px; }
+  .success-msg p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+  .success-msg strong { color: var(--text); }
+</style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="වැඩි විස්තර.html" class="logo">Lakmina Cinema</a>
-        <a href="home1.html" class="back-btn">Back</a>
-    </nav>
+<!-- ── VIDEO + CUSTOM CONTROLS ── -->
+<div class="video-outer">
 
-    <div class="player-section">
-        <div class="video-box" id="v-wrapper">
-            <div class="click-blocker"></div>
-            
-            <div id="player"></div>
-        </div>
+  <!-- iframe (pointer-events off so overlay intercepts) -->
+  <div class="video-wrap">
+    <iframe
+      src="https://www.youtube.com/embed/gvKmSQID41E?si=Wc_dFmB9-sW8MhOE&autoplay=0&controls=0&modestbranding=1&rel=0"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
 
-        <div class="movie-details">
-            <h1>නරඹන චිත්‍රපටය</h1>
-            <p>
-                වීඩියෝව හරවා සම්පූර්ණ තිරය පුරා (Full Screen) නැරඹීමට පහත බටන් එක භාවිතා කරන්න.
-            </p>
+  <!-- Full-area click → YouTube -->
+  <a class="yt-link-overlay"
+     href="https://youtu.be/gvKmSQID41E?si=Wc_dFmB9-sW8MhOE"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="YouTube වල open කරන්න">
+  </a>
 
-            <div class="btn-group">
-                <button class="btn btn-rotate" onclick="playFullRotate()">Rotate & Full Screen</button>
-                <a href="#" class="btn btn-play" onclick="location.reload()">Refresh Player</a>
-            </div>
-        </div>
+  <!-- ── FAKE CONTROLS BAR ── -->
+  <div class="fake-controls">
+
+    <!-- Red dot -->
+    <div class="ctrl-red-dot"></div>
+
+    <!-- Play button -->
+    <a class="ctrl-play"
+       href="https://youtu.be/gvKmSQID41E?si=Wc_dFmB9-sW8MhOE"
+       target="_blank" rel="noopener noreferrer" aria-label="Play">
+      <svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>
+    </a>
+
+    <!-- Volume icon -->
+    <div class="ctrl-vol">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+      </svg>
     </div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        let player;
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                videoId: 'Syjr6ylr5JY', 
-                playerVars: {
-                    'autoplay': 1,
-                    'mute': 0, 
-                    'controls': 0, // ලින්ක් ඉවත් කිරීමට controls: 0 තබා ඇත
-                    'rel': 0,
-                    'modestbranding': 1,
-                    'disablekb': 1, 
-                    'iv_load_policy': 3, 
-                    'playsinline': 1
-                },
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
+    <!-- Volume bar lines -->
+    <div class="ctrl-vol-bar">
+      <span></span>
+      <span></span>
+    </div>
 
-        function onPlayerReady(event) {
-            event.target.playVideo();
-        }
+    <!-- Time -->
+    <div class="ctrl-time">1:39 / 1:37:13</div>
 
-        function playFullRotate() {
-            const wrapper = document.getElementById('v-wrapper');
-            if (wrapper.requestFullscreen) { wrapper.requestFullscreen(); } 
-            else if (wrapper.webkitRequestFullscreen) { wrapper.webkitRequestFullscreen(); }
+    <!-- Progress bar -->
+    <div class="ctrl-progress">
+      <div class="ctrl-progress-fill">
+        <div class="ctrl-progress-dot"></div>
+      </div>
+    </div>
 
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(err => {});
-            }
-        }
+    <!-- Right icons -->
+    <div class="ctrl-icons-right">
 
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock();
-            }
-        });
-    </script>
+      <!-- Shield/safety icon -->
+      <div class="ctrl-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.25 3.75 10.15 9 11.35C17.25 21.15 21 16.25 21 11V5l-9-4z"/></svg>
+      </div>
 
+      <!-- Chapters/bookmark icon -->
+      <div class="ctrl-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+
+      <!-- YouTube open button -->
+      <a class="ctrl-yt-btn"
+         href="https://youtu.be/gvKmSQID41E?si=Wc_dFmB9-sW8MhOE"
+         target="_blank" rel="noopener noreferrer" aria-label="YouTube වල open කරන්න">
+        <svg viewBox="0 0 24 24"><path d="M21.58 7.19a2.76 2.76 0 00-1.94-1.95C18 5 12 5 12 5s-6 0-7.64.24a2.76 2.76 0 00-1.94 1.95A28.9 28.9 0 002 12a28.9 28.9 0 00.42 4.81 2.76 2.76 0 001.94 1.95C6 19 12 19 12 19s6 0 7.64-.24a2.76 2.76 0 001.94-1.95A28.9 28.9 0 0022 12a28.9 28.9 0 00-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
+        YT
+      </a>
+
+      <!-- Settings gear -->
+      <div class="ctrl-icon ctrl-gear">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.02 7.02 0 00-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54a7.02 7.02 0 00-1.62.94l-2.39-.96a.477.477 0 00-.59.22L2.74 9.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54a7.02 7.02 0 001.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 00-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      </div>
+
+      <!-- Fullscreen -->
+      <a class="ctrl-icon ctrl-fullscreen"
+         href="https://youtu.be/gvKmSQID41E?si=Wc_dFmB9-sW8MhOE"
+         target="_blank" rel="noopener noreferrer" aria-label="Full screen">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── TIPS BAR ── -->
+<div class="tips-bar">
+  <div class="tip-row">
+    <span class="tip-icon">📱</span>
+    <span>Phone එකෙන් බලනවා නම් — <b>↗ YT button</b> ස්පර්ශ කරන්න YouTube app එකෙදි full screen බලන්න</span>
+  </div>
+  <div class="tip-row">
+    <span class="tip-icon">⚙️</span>
+    <span>Quality වෙනස් කරන්න — YouTube player එකේ <b>⚙️ icon එක</b> ස්පර්ශ කරලා <b>Quality</b> තෝරන්න</span>
+  </div>
+</div>
+
+<!-- ── MESSAGE FORM ── -->
+<div class="below-video">
+  <div class="msg-card">
+    <div class="msg-header">
+      <span class="emoji">💬</span>
+      <h3>ඔයාගෙ ප්‍රශ්නය කියන්න</h3>
+    </div>
+
+    <div class="progress-dots">
+      <div class="dot done" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step active" id="step1">
+      <div class="step-label">👤 ඔයාගේ නම</div>
+      <input type="text" id="inputName" placeholder="නම" maxlength="50" autocomplete="off">
+      <div class="btn-row">
+        <button class="btn-next" onclick="goStep2()">ඊළඟ →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="step2">
+      <div class="step-label">📞 Phone Number <span style="color:#444;font-size:12px">(ලක්මිණ)</span></div>
+      <input type="tel" id="inputPhone" placeholder="+94 788 637 885" maxlength="20" autocomplete="off">
+      <div class="btn-row">
+        <button class="btn-skip" onclick="goStep3()">Skip</button>
+        <button class="btn-next" onclick="goStep3()">ඊළඟ →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" id="step3">
+      <div class="step-label">✍️ ඔයාගේ ප්‍රශ්නය හෝ Message</div>
+      <textarea id="inputMsg" rows="4" placeholder="ප්‍රශ්නය ලියන්න..."></textarea>
+      <div class="btn-row">
+        <button class="btn-next" id="sendBtn" onclick="sendMsg()">යවන්න ✈️</button>
+      </div>
+    </div>
+
+    <!-- Done -->
+    <div class="step" id="stepDone">
+      <div class="success-msg">
+        <div class="s-icon">✅</div>
+        <p><strong>Message එක ගිහිල්ලා!</strong><br>ඉක්මනටම reply කරනවා 🙏</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BOT = '8524435746:AAGpGH-ygNIUIsn9NGFZBsMUaKDDRpus8eI';
+  const CID = '7883989086';
+
+  function showStep(n) {
+    ['step1','step2','step3','stepDone'].forEach(id =>
+      document.getElementById(id).classList.remove('active')
+    );
+    document.getElementById('step' + n).classList.add('active');
+    document.getElementById('d1').classList.toggle('done', n >= 1);
+    document.getElementById('d2').classList.toggle('done', n >= 2);
+    document.getElementById('d3').classList.toggle('done', n >= 3);
+  }
+
+  function goStep2() {
+    if (!document.getElementById('inputName').value.trim()) {
+      document.getElementById('inputName').focus(); return;
+    }
+    showStep(2);
+    setTimeout(() => document.getElementById('inputPhone').focus(), 80);
+  }
+
+  function goStep3() {
+    showStep(3);
+    setTimeout(() => document.getElementById('inputMsg').focus(), 80);
+  }
+
+  async function sendMsg() {
+    const name  = document.getElementById('inputName').value.trim() || '—';
+    const phone = document.getElementById('inputPhone').value.trim() || '__';
+    const msg   = document.getElementById('inputMsg').value.trim();
+    if (!msg) { document.getElementById('inputMsg').focus(); return; }
+
+    const btn = document.getElementById('sendBtn');
+    btn.innerHTML = '<span class="spinner"></span> යවනවා...';
+    btn.disabled = true;
+
+    const text = `📩 Move-Hub-Message\n\n👤 නම: ${name}\n📞 Phone: ${phone}\n\n✍️ Message:\n${msg}`;
+
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CID, text })
+      });
+      if (res.ok) showStep('Done');
+      else throw new Error();
+    } catch {
+      btn.innerHTML = '🔄 නැවත try කරන්න';
+      btn.disabled = false;
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.shiftKey) return;
+    if (document.getElementById('step1').classList.contains('active')) { e.preventDefault(); goStep2(); }
+    else if (document.getElementById('step2').classList.contains('active')) { e.preventDefault(); goStep3(); }
+  });
+</script>
 </body>
 </html>
-
-
