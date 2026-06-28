@@ -6,15 +6,14 @@
     <title>Video Player | Lakmina Cinema</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #000; color: #fff; overflow-x: hidden; }
+        body { background: #000; color: #fff; }
 
         .navbar { padding: 15px 5%; background: rgba(0,0,0,0.9); display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; z-index: 1000; }
         .logo { color: #fff; font-size: 20px; font-weight: bold; text-decoration: none; }
         .back-btn { color: white; text-decoration: none; background: #333; padding: 6px 15px; border-radius: 4px; font-size: 14px; }
 
-        .player-section { padding-top: 70px; width: 100%; max-width: 900px; margin: 0 auto; }
+        .player-section { padding-top: 80px; max-width: 800px; margin: 0 auto; padding-left: 10px; padding-right: 10px; }
 
-        /* වීඩියෝව ස්ක්‍රීන් එකට ගැලපෙන ලෙස සැකසීම */
         .video-box {
             position: relative;
             width: 100%;
@@ -22,6 +21,7 @@
             background: #000;
         }
 
+        /* iframe එක හරියටම box එක ඇතුලේ පිරෙන සේ */
         .video-box iframe {
             position: absolute;
             top: 0; left: 0;
@@ -29,19 +29,8 @@
             border: none;
         }
 
-        /* Fullscreen ප්‍රකාරයේදී වීඩියෝව තිරය පිරී ඉතිරී යාමට */
-        :fullscreen .video-box, :-webkit-full-screen .video-box {
-            width: 100vw;
-            height: 100vh;
-            padding-bottom: 0;
-        }
-        :fullscreen .video-box iframe, :-webkit-full-screen .video-box iframe {
-            width: 100vw;
-            height: 100vh;
-        }
-
-        .movie-details { padding: 20px; }
-        .btn-group { margin-top: 15px; display: flex; gap: 10px; }
+        .movie-details { margin-top: 20px; }
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
         .btn { padding: 12px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; cursor: pointer; border: none; font-size: 14px; }
         .btn-rotate { background: #fbc02d; color: #000; }
         .btn-refresh { background: #444; color: #fff; }
@@ -55,7 +44,7 @@
     </nav>
 
     <div class="player-section">
-        <div class="video-box" id="v-wrapper">
+        <div class="video-box">
             <iframe 
                 id="main-frame"
                 src="https://drive.google.com/file/d/1F9RJr4H8E_T5pfFZOFWSrwiJUD8SMWR8/preview" 
@@ -66,7 +55,7 @@
 
         <div class="movie-details">
             <h1>නරඹන චිත්‍රපටය</h1>
-            <p>Full Screen සඳහා පහත බොත්තම ඔබන්න.</p>
+            <p>Full Screen සහ Quality සැකසුම් සඳහා පහත බොත්තම ඔබන්න.</p>
             <div class="btn-group">
                 <button class="btn btn-rotate" onclick="playFullRotate()">Rotate & Full Screen</button>
                 <button class="btn btn-refresh" onclick="location.reload()">Refresh</button>
@@ -76,18 +65,18 @@
 
     <script>
         function playFullRotate() {
-            const wrapper = document.getElementById('v-wrapper');
+            const iframe = document.getElementById('main-frame');
             
-            // Fullscreen කිරීම
-            if (wrapper.requestFullscreen) {
-                wrapper.requestFullscreen();
-            } else if (wrapper.webkitRequestFullscreen) {
-                wrapper.webkitRequestFullscreen();
+            // iframe එක කෙලින්ම Fullscreen කිරීම (එවිට ප්ලේයරයේ පාලක තීරුව පෙනේ)
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
             }
             
             // Landscape mode සැකසීම
             if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(err => console.log("Orientation lock failed"));
+                screen.orientation.lock('landscape').catch(err => console.log(err));
             }
         }
     </script>
