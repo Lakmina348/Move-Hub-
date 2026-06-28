@@ -2,125 +2,31 @@
 <html lang="si">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Video Player</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    background: #0d0d0d;
-    color: #e8e8f0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-
-  .player-wrapper {
-    width: 100%;
-    max-width: 920px;
-    background: #111;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-    border: 1px solid rgba(255,255,255,0.07);
-  }
-
-  /* ── IFRAME ── */
-  .video-container {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%;
-    background: #000;
-  }
-
-  .video-container iframe {
-    position: absolute;
-    inset: 0;
+  html, body {
     width: 100%;
     height: 100%;
-    border: none;
+    background: #000;
+    overflow: hidden;
+  }
+
+  iframe {
     display: block;
+    width: 100vw;
+    height: 100vh;
+    border: none;
   }
-
-  /* ── BOTTOM BAR ── */
-  .bottom-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: #111;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .hint-text {
-    font-size: 12px;
-    color: #555;
-    flex: 1;
-  }
-  .hint-text span {
-    color: #888;
-  }
-
-  .bar-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.05);
-    color: #ccc;
-    font-size: 12px;
-    font-family: inherit;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.15s, color 0.15s;
-    white-space: nowrap;
-  }
-  .bar-btn:hover {
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-  }
-
-  .bar-btn.primary {
-    background: linear-gradient(135deg, #1a73e8, #4a90d9);
-    border-color: transparent;
-    color: #fff;
-  }
-  .bar-btn.primary:hover {
-    background: linear-gradient(135deg, #1557b0, #3a7bc8);
-  }
-
-  /* Google Drive icon colours */
-  .gdrive-icon { font-size: 14px; }
 </style>
 </head>
 <body>
-
-<div class="player-wrapper">
-
-  <!-- Drive embed — full controls inside the iframe itself -->
-  <div class="video-container">
-    <iframe
-      id="videoFrame"
-      src="https://drive.google.com/file/d/1F9RJr4H8E_T5pfFZOFWSrwiJUD8SMWR8/preview"
-      allow="autoplay; fullscreen"
-      allowfullscreen>
-    </iframe>
-  </div>
-
-  <!-- Simple honest bottom bar -->
-  <div class="bottom-bar">
-    <span class="hint-text">
-      <span>⚙️ Quality, speed, subtitles</span> — use controls inside the player above
-    </span>
-  </div>
-
-</div>
-
+  <iframe
+    src="https://drive.google.com/file/d/1F9RJr4H8E_T5pfFZOFWSrwiJUD8SMWR8/preview"
+    allow="autoplay; fullscreen"
+    allowfullscreen>
+  </iframe>
 </body>
 </html>
