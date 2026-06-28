@@ -30,14 +30,63 @@
     width: 100%;
     padding-top: 56.25%;
     background: #000;
-  }
-  .video-wrap iframe {
-    position: absolute;
-    inset: 0; width: 100%; height: 100%;
-    border: none;
+    overflow: hidden;
   }
 
-  /* ── TIPS BAR below video ── */
+  /* Oversized iframe to push title bar out of view */
+  .video-wrap iframe {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border: none;
+    top: -42px;
+    height: calc(100% + 84px);
+  }
+
+  /* Black mask bars — top hides channel/title, bottom hides YouTube logo */
+  .video-wrap::before,
+  .video-wrap::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    background: #000;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .video-wrap::before { top: 0;    height: 42px; }
+  .video-wrap::after  { bottom: 0; height: 42px; }
+
+  /* End-screen overlay — covers full player when video ends */
+  .end-overlay {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    z-index: 5;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .end-overlay.show { display: flex; }
+  .end-overlay p {
+    color: rgba(255,255,255,0.75);
+    font-size: 15px;
+  }
+  .replay-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    padding: 11px 24px;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .replay-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* ── TIPS BAR ── */
   .tips-bar {
     background: #111118;
     border-bottom: 1px solid var(--border);
@@ -46,7 +95,6 @@
     flex-direction: column;
     gap: 6px;
   }
-
   .tip-row {
     display: flex;
     align-items: flex-start;
@@ -55,15 +103,8 @@
     color: #888;
     line-height: 1.5;
   }
-  .tip-row .tip-icon {
-    font-size: 15px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .tip-row span b {
-    color: #bbb;
-    font-weight: 600;
-  }
+  .tip-row .tip-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .tip-row span b { color: #bbb; font-weight: 600; }
 
   /* ── BELOW VIDEO ── */
   .below-video {
@@ -79,42 +120,20 @@
     border-radius: 18px;
     padding: 18px 16px;
   }
-
   .msg-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
   }
   .msg-header .emoji { font-size: 20px; }
-  .msg-header h3 {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-  }
+  .msg-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
 
-  /* Progress bar */
-  .progress-dots {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 14px;
-  }
+  .progress-dots { display: flex; gap: 5px; margin-bottom: 14px; }
   .dot {
-    height: 3px;
-    border-radius: 99px;
-    background: rgba(255,255,255,0.1);
-    flex: 1;
-    transition: background 0.35s;
+    height: 3px; border-radius: 99px;
+    background: rgba(255,255,255,0.1); flex: 1; transition: background 0.35s;
   }
   .dot.done { background: var(--accent); }
 
-  /* Steps */
-  .step {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    animation: fadeUp 0.22s ease;
-  }
+  .step { display: none; flex-direction: column; gap: 10px; animation: fadeUp 0.22s ease; }
   .step.active { display: flex; }
 
   @keyframes fadeUp {
@@ -122,10 +141,7 @@
     to   { opacity:1; transform:translateY(0); }
   }
 
-  .step-label {
-    font-size: 13px;
-    color: var(--muted);
-  }
+  .step-label { font-size: 13px; color: var(--muted); }
 
   input[type="text"], input[type="tel"], textarea {
     width: 100%;
@@ -147,52 +163,30 @@
   .btn-row { display: flex; gap: 8px; }
 
   .btn-next {
-    flex: 1;
-    background: var(--accent);
-    border: none;
-    border-radius: 11px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 13px;
-    cursor: pointer;
-    font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
+    flex: 1; background: var(--accent); border: none; border-radius: 11px;
+    color: #fff; font-size: 14px; font-weight: 700; padding: 13px;
+    cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent;
     transition: opacity 0.2s, transform 0.15s;
   }
   .btn-next:active { transform: scale(0.97); opacity: 0.88; }
 
   .btn-skip {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--border);
-    border-radius: 11px;
-    color: var(--muted);
-    font-size: 13px;
-    padding: 13px 16px;
-    cursor: pointer;
-    font-family: inherit;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 11px; color: var(--muted); font-size: 13px;
+    padding: 13px 16px; cursor: pointer; font-family: inherit;
     -webkit-tap-highlight-color: transparent;
   }
   .btn-skip:active { background: rgba(255,255,255,0.12); }
 
-  /* Spinner */
   .spinner {
     width: 15px; height: 15px;
-    border: 2px solid rgba(255,255,255,0.25);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 6px;
+    border: 2px solid rgba(255,255,255,0.25); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    display: inline-block; vertical-align: middle; margin-right: 6px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Success */
-  .success-msg {
-    text-align: center;
-    padding: 12px 0 6px;
-  }
+  .success-msg { text-align: center; padding: 12px 0 6px; }
   .success-msg .s-icon { font-size: 42px; margin-bottom: 10px; }
   .success-msg p { font-size: 14px; color: var(--muted); line-height: 1.7; }
   .success-msg strong { color: var(--text); }
@@ -203,10 +197,17 @@
 <!-- ── VIDEO ── -->
 <div class="video-wrap">
   <iframe
-    src="https://www.youtube-nocookie.com/embed/gvKmSQID41E?rel=0&modestbranding=1&controls=1"
+    id="ytPlayer"
+    src="https://www.youtube-nocookie.com/embed/gvKmSQID41E?rel=0&modestbranding=1&controls=1&iv_load_policy=3&enablejsapi=1&widgetid=1"
     allow="autoplay; fullscreen; picture-in-picture"
     allowfullscreen>
   </iframe>
+
+  <!-- Shows when video ends — blocks YouTube end-screen recommendations -->
+  <div class="end-overlay" id="endOverlay">
+    <p>🎬 Video එක ඉවරයි</p>
+    <button class="replay-btn" onclick="replayVideo()">↩ නැවත බලන්න</button>
+  </div>
 </div>
 
 <!-- ── TIPS BAR ── -->
@@ -235,7 +236,6 @@
       <div class="dot" id="d3"></div>
     </div>
 
-    <!-- Step 1 -->
     <div class="step active" id="step1">
       <div class="step-label">👤 ඔයාගේ නම</div>
       <input type="text" id="inputName" placeholder="නම" maxlength="50" autocomplete="off">
@@ -244,7 +244,6 @@
       </div>
     </div>
 
-    <!-- Step 2 -->
     <div class="step" id="step2">
       <div class="step-label">📞 Phone Number <span style="color:#444;font-size:12px">(ලක්මිණ)</span></div>
       <input type="tel" id="inputPhone" placeholder="+94 788 637 885" maxlength="20" autocomplete="off">
@@ -254,7 +253,6 @@
       </div>
     </div>
 
-    <!-- Step 3 -->
     <div class="step" id="step3">
       <div class="step-label">✍️ ඔයාගේ ප්‍රශ්නය හෝ Message</div>
       <textarea id="inputMsg" rows="4" placeholder="ප්‍රශ්නය ලියන්න..."></textarea>
@@ -263,7 +261,6 @@
       </div>
     </div>
 
-    <!-- Done -->
     <div class="step" id="stepDone">
       <div class="success-msg">
         <div class="s-icon">✅</div>
@@ -277,6 +274,36 @@
   const BOT = '8524435746:AAGpGH-ygNIUIsn9NGFZBsMUaKDDRpus8eI';
   const CID = '7883989086';
 
+  /* ── YouTube IFrame API ── */
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+
+  var player;
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('ytPlayer', {
+      events: {
+        onStateChange: function(e) {
+          // State 0 = ended
+          if (e.data === 0) {
+            document.getElementById('endOverlay').classList.add('show');
+          } else {
+            document.getElementById('endOverlay').classList.remove('show');
+          }
+        }
+      }
+    });
+  }
+
+  function replayVideo() {
+    document.getElementById('endOverlay').classList.remove('show');
+    if (player && player.seekTo) {
+      player.seekTo(0);
+      player.playVideo();
+    }
+  }
+
+  /* ── Form ── */
   function showStep(n) {
     ['step1','step2','step3','stepDone'].forEach(id =>
       document.getElementById(id).classList.remove('active')
