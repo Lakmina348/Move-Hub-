@@ -316,13 +316,40 @@
     else if (document.getElementById('step2').classList.contains('active')) { e.preventDefault(); goStep3(); }
   });
 
-  /* ── Comments ── */
-  let comments = [
-    {id:1, name:'Move Hub', text:'ඕන දෙයක් අහන්න / කතා කරන්න ☎️ 0788637885', ts:Date.now(), likes:0, liked:false}
-  ];
+  /* ── Comments (shared via jsonbin.io so everyone sees the same comments) ── */
+  const JSONBIN_BIN_ID = 'YOUR_BIN_ID';      // ← jsonbin.io Bin ID එක මෙතන දාන්න
+  const JSONBIN_API_KEY = 'YOUR_API_KEY';    // ← jsonbin.io X-Master-Key එක මෙතන දාන්න
+  const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+  const DEFAULT_COMMENT = {id:1, name:'Move Hub', text:'ඕන දෙයක් අහන්න / කතා කරන්න ☎️ 0788637885', ts:Date.now(), likes:0, liked:false};
+  let comments = [DEFAULT_COMMENT];
   let pendingDeleteId = null;
   let pressTimer = null;
   let pressTarget = null;
+
+  async function loadComments() {
+    try {
+      const res = await fetch(JSONBIN_URL + '/latest', {
+        headers: { 'X-Master-Key': JSONBIN_API_KEY, 'X-Bin-Meta': 'false' }
+      });
+      if (!res.ok) throw new Error('load failed');
+      const data = await res.json();
+      comments = (data && Array.isArray(data.comments) && data.comments.length>0) ? data.comments : [DEFAULT_COMMENT];
+    } catch (e) {
+      comments = [DEFAULT_COMMENT];
+    }
+    renderComments();
+  }
+
+  async function saveComments() {
+    try {
+      await fetch(JSONBIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+        body: JSON.stringify({ comments })
+      });
+    } catch (e) {}
+  }
 
   const AVATAR_COLORS = [
     'linear-gradient(135deg,#4f8ef7,#7c5ef7)',
@@ -409,6 +436,7 @@
       } catch(e) {}
 
       comments = comments.filter(x=>x.id!==pendingDeleteId);
+      saveComments();
     }
     closeModal();
     renderComments();
@@ -499,6 +527,7 @@
     if (!c) return;
     c.liked=!c.liked; c.likes=c.liked?c.likes+1:Math.max(0,c.likes-1);
     renderComments();
+    saveComments();
   }
 
   async function postComment() {
@@ -524,11 +553,12 @@
     nameEl.value=''; textEl.value='';
     btn.disabled=false; btn.innerHTML='<span>💬</span> Comment දාන්න';
     renderComments();
+    saveComments();
     showToast('✅ Comment add කළා!');
     document.getElementById('commentList').scrollIntoView({behavior:'smooth',block:'start'});
   }
 
-  renderComments();
+  loadComments();
 </script>
 </body>
 </html>
